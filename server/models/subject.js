@@ -3,13 +3,6 @@ class Subject {
     this.name = name
     this.id = id
   }
-
-  toJSON() {
-    return {
-      name: this.name,
-      id: this.id
-    }
-  }
 }
 
 module.exports = Subject

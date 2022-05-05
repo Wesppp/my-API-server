@@ -1,6 +1,5 @@
-const subjectService = require('../services/utils')
+const subjectService = require('../services/subject-service')
 const Subject = require('../models/subject')
-const {randomUUID} = require('crypto');
 
 exports.getAll = async function (req, res) {
   const subjects = await subjectService.getAll()
@@ -20,9 +19,8 @@ exports.getById = async function (req, res) {
 
 exports.save = async function(req, res) {
   if (req.body.name === '' || !req.body) return res.sendStatus(400);
-  const id = randomUUID();
 
-  let subject = new Subject(req.body.name, id)
+  let subject = new Subject(req.body.name, 0)
   await subjectService.save(subject)
   res.send(subject);
 }
