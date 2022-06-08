@@ -1,59 +1,81 @@
-const {randomUUID} = require('crypto');
-const Utils = require('../utils')
-const fs = require("fs");
-const path = require("path");
+const User = require("../models/user")
+const Project = require("../models/project")
+const jwt = require('jsonwebtoken');
+const JWT_Secret = 'your_secret_key'
+
+function mapUserItems(arr, field) {
+  return arr.items.map(el => ({
+      ...el[field]._doc
+  }))
+}
+
 
 exports.getAll = async function () {
-    return new Promise((resolve, reject) => {
-      fs.readFile(
-        path.join(__dirname, '../data/subjects.json'),
-        'utf-8', (err, content) => {
-          if (err) {
-            reject(err)
-          } else {
-            resolve(JSON.parse(content))
-          }
-        }
-      )
-    })
+  const users = await User.find()
+  return users
 }
 
 exports.getById = async function (id) {
-    const subjects = await this.getAll()
-    return subjects.find(subject => subject.id === id)
+  const user = await User.findById(id)
+  return user
 }
 
-exports.save = async function (subject) {
-    const subjects = await this.getAll()
-    if (subject) {
-        subject.id = randomUUID()
-        console.log(subject)
-        subjects.push(subject)
-    }
-    return await Utils.saveFile(subjects)
+exports.save = async function (newUser) {
+  const repeatUser = await User.find({email: newUser.email});
+  
+  if (!repeatUser.length) {
+    const user = new User({
+      name: newUser.name,
+      password: newUser.password,
+      role: 'user',
+      email: newUser.email,
+      projects: {items: []}
+  })
+    return user
+  } else {
+    return false
+  }
 }
 
-exports.update = async function (subject) {
-    const subjects = await this.getAll();
-    if (subject) {
-        const ids = subjects.findIndex(i => i.id === subject.id);
-        subjects[ids] = subject;
-    }
-    return await Utils.saveFile(subjects)
+exports.update = async function (newUserData) {
+  const {id} = newUserData
+  delete newUserData.id
+  const user = await User.findByIdAndUpdate(id, newUserData)
+  return user
 }
 
-exports.delete = async function (id) {
-    let subjects = await this.getAll();
-    let index = -1;
+exports.login = async function (user) {
+  const loginUser = await User.find({
+    email: user.email,
+    password: user.password
+  });
 
-    index = subjects.findIndex((a) => a.id === id);
+  if (loginUser.length) {
+    let token = jwt.sign(loginUser[0].toJSON(), JWT_Secret)
+    return {signed_user: loginUser[0], token: token}
+  }
+}
 
-    if (index > -1) {
-        const subject = subjects.splice(index, 1)[0];
-        subjects = JSON.stringify(subjects);
-        Utils.saveFileSync(subjects)
-        return subject
-    } else {
-        return null
-    }
+exports.getProjectsInUser = async function(id) {
+  const user = await User.findById(id)
+    .populate('projects.items.projectId')
+
+  let projects = mapUserItems(user.projects, 'projectId')
+  return projects
+}
+
+exports.getUserReports = async function(id) {
+  const user = await User.findById(id)
+    .populate('reports.items.reportId')
+
+  let reports = mapUserItems(user.reports, 'reportId')
+  return reports
+}
+
+exports.excludeUser = async function(excludeUser, projectId) {
+  const user = await User.findById(excludeUser._id)
+  const project = await Project.findById(projectId)
+  await user.removeProject(projectId)
+  await project.removeUser(excludeUser._id)
+  return user
 }
