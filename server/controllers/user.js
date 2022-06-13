@@ -62,17 +62,11 @@ exports.getProjectsInUser = async function(req, res) {
     }
 }
 
-exports.getUserReports = async function(req, res) {
-    try {
-        const reports = await userService.getUserReports(req.params.id)
-        res.send(reports)
-    } catch(e) {
-        console.log(e)
-        res.status(404).send()
-    }
-}
-
 exports.excludeUser = async function(req, res) {
-    const user = await userService.excludeUser(req.body, req.params.id)
-    res.send(user)
+    try {
+        const project = await userService.excludeUser(req.body, req.params.id)
+        res.send(project)
+    } catch (e) {
+        console.log(e);
+    }
 } 

@@ -28,17 +28,6 @@ const user = new Schema({
                 }
             }
         ]
-    },
-    reports: {
-        items: [
-            {
-                reportId: {
-                    type: Schema.Types.ObjectId,
-                    required: true,
-                    ref: 'Report'
-                }
-            }
-        ]
     }
 })
 
@@ -61,16 +50,6 @@ user.methods.removeProject = function(id) {
     }
 
     this.projects = {items}
-    return this.save()
-}
-
-user.methods.addReport = function(report) {
-    const items = [...this.reports.items]
-    items.push({
-        reportId: report._id
-    })
-    this.reports = {items}
-
     return this.save()
 }
 

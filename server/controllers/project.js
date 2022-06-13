@@ -21,7 +21,6 @@ exports.getById = async function (req, res) {
 exports.save = async function(req, res) {
     try {
         const project = await projectService.save(req.body, req.user._id)
-        await project.save()
         res.send(project)
     } catch(e) {
         console.log(e)
@@ -30,6 +29,11 @@ exports.save = async function(req, res) {
 
 exports.update = async function(req, res) {
     const project = await projectService.update(req.body)
+    res.send(project)
+}
+
+exports.finish = async function(req, res) {
+    const project = await projectService.finish(req.body)
     res.send(project)
 }
 
@@ -57,5 +61,24 @@ exports.getUsersInProject = async function(req, res) {
         res.send(users);
     } catch(e) {
         res.status(404).send();
+    }
+}
+
+exports.excludeUser = async function(req, res) {
+    try {
+        const project = await projectService.excludeUser(req.body, req.params.id)
+        res.send(project)
+    } catch (e) {
+        console.log(e);
+    }
+} 
+
+exports.getProjectReports = async function(req, res) {
+    try {
+        const reports = await projectService.getProjectReports(req.params.id)
+        res.send(reports)
+    } catch(e) {
+        console.log(e)
+        res.status(404).send()
     }
 }

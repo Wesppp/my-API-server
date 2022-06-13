@@ -28,17 +28,18 @@ function authenticateToken(req, res, next) {
 app.get("/api/projects", projectController.getAll);
 app.get("/api/projects/:id", projectController.getById);
 app.get("/api/projects/users/:id", projectController.getUsersInProject);
+app.get("/api/projects/reports/:id", projectController.getProjectReports);
 app.post("/api/projects", authenticateToken, jsonParser, projectController.save);
 app.post("/api/projects/add-user/:id", jsonParser, projectController.addUser);
+app.post("/api/projects/exclude-user/:id", jsonParser, projectController.excludeUser);
 app.delete("/api/projects/:id", projectController.delete);
 app.put("/api/projects", jsonParser, projectController.update);
+app.put("/api/projects/finish", jsonParser, projectController.finish);
 
 app.get("/api/users", userController.getAll);
 app.get("/api/users/:id", userController.getById);
 app.get("/api/users/projects/:id", userController.getProjectsInUser);
-app.get("/api/users/reports/:id", userController.getUserReports);
 app.post("/api/users", jsonParser, userController.save);
-app.post("/api/users/exclude/:id", jsonParser, userController.excludeUser);
 app.delete("/api/users/:id", userController.delete);
 app.put("/api/users", jsonParser, userController.update);
 app.post("/api/users/login", jsonParser, userController.login);
@@ -46,6 +47,7 @@ app.post("/api/users/login", jsonParser, userController.login);
 app.get("/api/comments/:id", commentController.getByProjectId);
 app.post("/api/comments/add/:id", authenticateToken, jsonParser, commentController.save);
 
+app.get("/api/reports", reportController.getAll);
 app.post("/api/reports/add/:id", authenticateToken, jsonParser, reportController.save);
 
 async function start() {

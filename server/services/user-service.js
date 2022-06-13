@@ -9,7 +9,6 @@ function mapUserItems(arr, field) {
   }))
 }
 
-
 exports.getAll = async function () {
   const users = await User.find()
   return users
@@ -62,20 +61,4 @@ exports.getProjectsInUser = async function(id) {
 
   let projects = mapUserItems(user.projects, 'projectId')
   return projects
-}
-
-exports.getUserReports = async function(id) {
-  const user = await User.findById(id)
-    .populate('reports.items.reportId')
-
-  let reports = mapUserItems(user.reports, 'reportId')
-  return reports
-}
-
-exports.excludeUser = async function(excludeUser, projectId) {
-  const user = await User.findById(excludeUser._id)
-  const project = await Project.findById(projectId)
-  await user.removeProject(projectId)
-  await project.removeUser(excludeUser._id)
-  return user
 }
