@@ -20,25 +20,29 @@ exports.getById = async function (id) {
 }
 
 exports.save = async function (newProject, creatorId) {
-  let repeatProject = await Project.find({title: newProject.title})
-
-  if (!repeatProject.length) {
-    const project = new Project({
-      title: newProject.title,
-      description: newProject.description,
-      startDate: new Date().toLocaleDateString(),
-      endDate: newProject.endDate || '',
-      img: newProject.img || 'https://i0.wp.com/enbeeone3.com/wp-content/uploads/2015/01/absolute-beginner-guide.jpg?resize=300%2C200&ssl=1',
-      creatorId: creatorId,
-      users: {items: []},
-      comments: {items: []}
-    })
-    await project.save() 
-    return project
-  } else {
-    return false
+  let repeatProject = await Project.find({title: {$regex: newProject.title, $options: 'i'}})
+  
+  try {
+    if (!repeatProject.length) {
+      const project = new Project({
+        title: newProject.title,
+        description: newProject.description,
+        startDate: new Date().toLocaleDateString(),
+        endDate: newProject.endDate || '',
+        img: newProject.img || 'https://i0.wp.com/enbeeone3.com/wp-content/uploads/2015/01/absolute-beginner-guide.jpg?resize=300%2C200&ssl=1',
+        creatorId: creatorId,
+        users: {items: []},
+        comments: {items: []},
+        status: 0
+      })
+      await project.save() 
+      return project
+    } else {
+      throw new SyntaxError('There is already a project with this title')
+    }
+  } catch (e) {
+    throw e.message
   }
-
 }
 
 exports.update = async function (newProjectData) {

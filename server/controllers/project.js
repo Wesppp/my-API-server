@@ -23,7 +23,7 @@ exports.save = async function(req, res) {
         const project = await projectService.save(req.body, req.user._id)
         res.send(project)
     } catch(e) {
-        console.log(e)
+        res.send(e)
     }
 }
 

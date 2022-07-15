@@ -3,7 +3,8 @@ const {Schema, model} = require('mongoose')
 const project = new Schema({
     title: {
         type: String,
-        required: true
+        required: true,
+        index: true
     },
     description: {
         type: String,
@@ -22,6 +23,10 @@ const project = new Schema({
     creatorId: {
         type: Schema.Types.ObjectId,
         ref: 'User'
+    },
+    status: {
+        type: Number,
+        required: true
     },
     users: {
         items: [
