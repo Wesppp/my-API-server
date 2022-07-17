@@ -12,7 +12,8 @@ exports.save = async function(newReport, projectId, author) {
   const report = new Report({
     report: newReport.report,
     createDate: new Date().toLocaleString(),
-    authorId: author._id
+    authorId: author._id,
+    projectTitle: project.title
   })
 
   await report.save()

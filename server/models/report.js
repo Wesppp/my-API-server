@@ -16,6 +16,10 @@ const report = new Schema({
     projectId: {
       type: Schema.Types.ObjectId,
       ref: 'Project'
+    },
+    projectTitle: {
+      type: String,
+      required: true
     }
 })
 
